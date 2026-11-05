@@ -151,7 +151,7 @@ Panel {
                             width: parent.width; height: hero.implicitHeight+Style.space(12)
                             PlainText {
                                 id: hero; anchors.horizontalCenter: parent.horizontalCenter
-                                text: Model.monthName(root.today.monthIndex,root.monthSystem)+" "+I18n.formatNumber(root.today.day)
+                                text: Model.monthName(root.viewMonth,root.monthSystem)+" "+I18n.formatNumber(root.selectedDay)
                                 font.family: root.family; font.pixelSize: Math.min(Style.space(52),parent.width/9); font.bold: true
                                 color: root.fg
                             }
