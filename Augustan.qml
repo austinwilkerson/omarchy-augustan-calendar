@@ -85,6 +85,8 @@ Panel {
         anchors.fill: parent
         bar: root.bar
         text: root.vertical ? Model.time(root.now).slice(0,-3).replace(':','\n') : ((root.setting("placement","centerBegin")==="centerEnd" ? "| " : "") + Model.label(root.now, root.activeFormat,root.monthSystem) + (root.setting("placement","centerBegin")==="centerBegin" ? " |" : ""))
+        // The regular clock already supplies padding beside the separator.
+        horizontalMargin: (root.setting("placement","centerBegin")==="centerBegin" || root.setting("placement","centerBegin")==="centerEnd") ? 0 : 8.5
         labelVisible: true
         pressFeedbackButtons: Qt.NoButton
         tooltipText: Model.plain(strings.t("barHint"))
