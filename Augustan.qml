@@ -27,7 +27,7 @@ Panel {
     readonly property string selectedTheme: Model.theme(viewMonth, selectedDay)
     readonly property var selectedHolidays: showHoly ? Model.holidays(viewMonth, selectedDay) : []
     readonly property var quote: showQuotes ? Quotes.forDay(viewYear, viewMonth, selectedDay, selectedTheme) : null
-    readonly property color fg: bar ? bar.foreground : Commons.Color.foreground
+    readonly property color fg: Commons.Color.popups.text
     readonly property string family: bar ? bar.fontFamily : Style.font.family
     readonly property int countDays: Model.daysInMonth(viewYear, viewMonth)
     Translations { id: strings; directory: Qt.resolvedUrl("i18n") }

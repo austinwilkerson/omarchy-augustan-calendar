@@ -18,6 +18,12 @@ The month names default to disciples, from Petras through Thomas. Numerical and 
 
 You can try this alongside your regular Gregorian clock. Nothing requires you to replace your existing calendar or adopt the system to explore it. The [original Augustan Calendar project](https://github.com/austinwilkerson/Augustan-Calendar) provides the companion browser calendar.
 
+## Compatibility
+
+Verified on **Omarchy Stable 4.5 (4.5.0-3)** with Hyprland 0.56.2 and
+Quickshell 0.3.2. Calendar arithmetic, native calendar/settings panels and live
+popup theme bindings are checked on this version. Earlier development used RC 4.5.
+
 ## Install
 
 Requires Omarchy's Quickshell-based shell with `omarchy plugin` support. Runtime dependencies are Qt Quick, Quickshell, and Omarchy's shared shell components, supplied by Omarchy. The optional installer uses Bash, Git, and standard file utilities. No additional packages, network services, or API keys are needed at runtime.
@@ -69,6 +75,7 @@ TZ=America/Louisville node tests/calendar.cjs
 TZ=UTC node tests/calendar.cjs
 omarchy plugin validate .
 bash -n install.sh
+bash tests/check-qml.sh
 ```
 
 Tests cover every calendar day from 1999 through 2401, leap and century boundaries, time conversion, all display formats, month navigation, observances, quote availability, ordinary-day hiding, year progress and tooltip escaping.
