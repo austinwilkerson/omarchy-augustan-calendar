@@ -1,0 +1,20 @@
+{
+ "schemaVersion":1,
+ "id":"io.github.austinwilkerson.augustan",
+ "name":"Omarchy Augustan Calendar",
+ "version":"1.0.0",
+ "author":"Austin Wilkerson",
+ "license":"MIT",
+ "description":"A native Augustan calendar, decimal clock, day themes and reflections for Omarchy.",
+ "kinds":["bar-widget"],
+ "entryPoints":{"barWidget":"Augustan.qml"},
+ "barWidget":{
+   "displayName":"Augustan Calendar","category":"Time","allowMultiple":false,"defaultSection":"centerBegin",
+   "defaults":{"format":"date-time","specialDays":true,"holyDays":true,"quotes":true},
+   "schema":[
+     {"key":"specialDays","type":"boolean","label":"Show Spirit, Soul, Mind and Body days","defaultValue":true},
+     {"key":"holyDays","type":"boolean","label":"Show high holy days and religious holidays","defaultValue":true},
+     {"key":"quotes","type":"boolean","label":"Show quotes on special days","defaultValue":true}
+   ]
+ }
+}
