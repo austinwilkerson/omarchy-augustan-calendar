@@ -196,7 +196,7 @@ Panel {
                                     PlainText { anchors.centerIn: parent; text: I18n.formatNumber(cell.day); color: root.fg; font.family: root.family; font.bold: cell.isToday }
                                     Row {
                                         anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom; anchors.bottomMargin: Style.space(7); spacing: Style.space(4)
-                                        Rectangle { visible: cell.theme!==""; width: Style.space(12); height: Style.space(2); color: Commons.Color.accent; opacity: 0.65 }
+                                        Rectangle { visible: cell.theme!==""; width: Style.space(12); height: Style.space(2); color: ({Spirit: "#6B8E23", Soul: "#4682B4", Mind: "#663399", Body: "#CD853F"})[cell.theme] || "transparent"; opacity: 0.65 }
                                         Rectangle { visible: cell.holy.length>0; width: Style.space(4); height: width; radius: width/2; color: root.fg; opacity: 0.7 }
                                     }
                                     MouseArea { id: cellMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.selectedDay=cell.day }
