@@ -31,7 +31,9 @@ Panel {
     readonly property string family: bar ? bar.fontFamily : Style.font.family
     readonly property int countDays: Model.daysInMonth(viewYear, viewMonth)
     Translations { id: strings; directory: Qt.resolvedUrl("i18n") }
-    implicitWidth: button.implicitWidth
+    readonly property string clockSide: String(setting("placement", "centerBegin"))
+    readonly property real outerClockPadding: !vertical && (clockSide==="centerBegin" || clockSide==="centerEnd") ? Style.spaceReal(8.5) : 0
+    implicitWidth: button.implicitWidth + outerClockPadding
     implicitHeight: button.implicitHeight
 
     function save(key,value) {
@@ -83,6 +85,8 @@ Panel {
     WidgetButton {
         id: button
         anchors.fill: parent
+        anchors.leftMargin: root.clockSide==="centerBegin" ? root.outerClockPadding : 0
+        anchors.rightMargin: root.clockSide==="centerEnd" ? root.outerClockPadding : 0
         bar: root.bar
         text: root.vertical ? Model.time(root.now).slice(0,-3).replace(':','\n') : ((root.setting("placement","centerBegin")==="centerEnd" ? "| " : "") + Model.label(root.now, root.activeFormat,root.monthSystem) + (root.setting("placement","centerBegin")==="centerBegin" ? " |" : ""))
         // The regular clock already supplies padding beside the separator.
