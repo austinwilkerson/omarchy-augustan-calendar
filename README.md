@@ -4,13 +4,27 @@ A native Omarchy shell plugin with an Augustan decimal clock, a ten-day calendar
 
 The calendar opens inside Omarchy. It needs no browser, web server, account, or network connection. Theme, fonts, panel borders, motion and layout direction follow the shell.
 
+![Augustan calendar panel with colored day markings, year progress, and a themed quote](preview.png)
+
+## What is the Augustan calendar?
+
+The Augustan calendar is an alternative calendar created by Austin Wilkerson. It keeps the familiar length of a day and year, but gives them a different rhythm: ten-day weeks, nine regular 40-day months, and a short festival month at the end of the year.
+
+It also uses decimal time. Instead of 24 hours, a day has 10 hours, each containing 100 minutes of 100 seconds. Conventional noon is **5:00:00**. The same moment can be shown as a percentage of the day: **7:95:45** is approximately **79.5%**. The day still begins at local midnight.
+
+Four days of each ten-day week invite a different focus: **Spirit**, **Soul**, **Mind**, and **Body**. The calendar marks them gently in green, blue, purple, and brown, and offers a short quote from Scripture, writers, or thinkers. Ordinary days leave that space quiet. Religious observances and day markings can be switched off independently; quotes have their own switch.
+
+The month names default to disciples, from Petras through Thomas. Numerical and seasonal names are available in settings. Thomas is the closing festival period, including Christmas and, when needed, Leap Day. The full rules and observances are described below.
+
+You can try this alongside your regular Gregorian clock. Nothing requires you to replace your existing calendar or adopt the system to explore it. The [original Augustan Calendar project](https://github.com/austinwilkerson/Augustan-Calendar) provides the companion browser calendar.
+
 ## Install
 
-Requires Omarchy's Quickshell-based shell with `omarchy plugin` support.
+Requires Omarchy's Quickshell-based shell with `omarchy plugin` support. Runtime dependencies are Qt Quick, Quickshell, and Omarchy's shared shell components, supplied by Omarchy. The optional installer uses Bash, Git, and standard file utilities. No additional packages, network services, or API keys are needed at runtime.
 
 ```bash
 omarchy plugin add https://github.com/austinwilkerson/omarchy-augustan-calendar --enable --yes
-omarchy bar move io.github.austinwilkerson.augustan --section centerBegin --index 999
+omarchy bar move io.github.austinwilkerson.augustan --before omarchy.clock
 ```
 
 Or clone this repository and run `bash install.sh`. Its optional argument selects `centerBegin` (default, left of the regular clock), `centerEnd` (right of it), `left`, `right`, `center`, or `tray`. The plugin follows a vertical bar too. The regular clock remains part of a centered pair, and its format is preserved.
