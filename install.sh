@@ -20,5 +20,9 @@ if [[ "$source_dir" != "$target" ]]; then
 fi
 omarchy-shell shell rescanPlugins
 omarchy plugin enable "$id" --section "$section"
+case "$section" in
+  centerBegin) omarchy bar move "$id" --before omarchy.clock ;;
+  centerEnd) omarchy bar move "$id" --after omarchy.clock ;;
+esac
 omarchy bar set "$id" placement "$section"
 echo 'Omarchy Augustan Calendar installed. Click to open; right-click to cycle formats.'

@@ -13,22 +13,22 @@ omarchy plugin add https://github.com/austinwilkerson/omarchy-augustan-calendar 
 omarchy bar move io.github.austinwilkerson.augustan --section centerBegin --index 999
 ```
 
-Or clone this repository and run `bash install.sh`. Its optional argument selects `centerBegin` (default, left of the regular clock), `centerEnd` (right of it), `left`, `right`, `center`, or `tray`. The plugin follows a vertical bar too. The regular clock remains centered, and its format is preserved.
+Or clone this repository and run `bash install.sh`. Its optional argument selects `centerBegin` (default, left of the regular clock), `centerEnd` (right of it), `left`, `right`, `center`, or `tray`. The plugin follows a vertical bar too. The regular clock remains part of a centered pair, and its format is preserved.
 
 The installer backs up any existing copy under `~/.local/state/omarchy/augustan-backups/` (respecting XDG paths). When replacing the original web-link prototype, a shell restart may be needed once: `omarchy restart shell`.
 
 ## Use
 
 - **Left-click** opens the native calendar.
-- **Right-click** cycles through eight display formats and saves the selection.
-- **Gear** opens settings for format, day markings, quotes, and bar placement.
+- **Right-click** cycles through nine display formats and saves the selection.
+- **Gear** opens settings for month names, day markings, quotes, and bar placement.
 - **Click a day** to see its observances and, on themed days, its reflection.
 - **Click the large date**, press **Home** or **Enter** to return to today.
 - **Left/Right** browse months; **Up/Down** browse years.
 - **Escape** leaves settings, then closes the calendar. Clicking outside also closes it.
 - Settings and day cells can be reached with **Tab** and activated with **Space/Enter**.
 
-The default bar label is `Prime 1 Petras 07:95`. Alternatives show weekday/time, weekday/time with seconds, time alone, date/week/year, numeric date/time, date/day percentage, or day percentage alone. There is no AM/PM. `07:95:45` is `79.5%` of the day (one decimal place, capped at 99.9% before midnight).
+The default bar label is `Petras 1 7:95`. Alternatives show weekday/time, weekday/time with seconds, time alone, date/week/year, numeric date/time, date/day percentage, or day percentage alone. There is no AM/PM. `7:95:45` is `79.5%` of the day (one decimal place, capped at 99.9% before midnight).
 
 ## Calendar and reflections
 
@@ -62,3 +62,7 @@ Tests cover every calendar day from 1999 through 2401, leap and century boundari
 For local integration, `omarchy-shell io.github.austinwilkerson.augustan.calendar status` reports panel state. The same IPC target offers `settings`, `cycleFormat`, `today`, `nextMonth`, `previousMonth`, and `selectDay <number>`. Open/close/toggle use `omarchy-shell io.github.austinwilkerson.augustan open` (or `close`/`toggle`).
 
 MIT licensed. Quotes retain their original public-domain provenance.
+
+## Version 1.1
+
+Right-click includes month/day/time with and without seconds and month/day/day-percentage formats. Hours run from 0 through 9 without a leading zero. Settings offer disciple (default), numerical, and seasonal month names and omit the redundant format picker. Quote theme headings and day underlines share their assigned fixed colors. Beside-clock placements center both clocks as one group and display a `|` between them.

@@ -36,5 +36,9 @@
   "Feast of the Christ": "Feast of the Christ",
   "Christmas Eve": "Christmas Eve",
   "Christmas": "Christmas",
-  "Leap Day": "Leap Day"
+  "Leap Day": "Leap Day",
+  "monthNames": "Month names",
+  "months.disciple": "Disciples",
+  "months.numerical": "Numerical",
+  "months.seasonal": "Seasonal"
 }

@@ -19,6 +19,7 @@ Panel {
     property bool editing: false
     property string placementError: ""
     readonly property bool vertical: bar ? bar.vertical : false
+    readonly property string monthSystem: String(setting("monthNames", "disciple"))
     readonly property string activeFormat: String(setting("format", "date-time"))
     readonly property bool showSpecial: setting("specialDays", true) === true
     readonly property bool showHoly: setting("holyDays", true) === true
@@ -49,7 +50,9 @@ Panel {
     function open() { goToToday(); editing=false; root.controller.show(); }
     function place(section) {
         root.placementError="";
-        placement.command=["omarchy","bar","move",root.moduleName,"--section",section,"--index",section==="centerBegin"?"999":"0"];
+        placement.command=(section==="centerBegin" || section==="centerEnd")
+            ? ["omarchy","bar","move",root.moduleName,section==="centerBegin"?"--before":"--after","omarchy.clock"]
+            : ["omarchy","bar","move",root.moduleName,"--section",section,"--index","0"];
         placement.running=true;
     }
     Process {
@@ -58,7 +61,7 @@ Panel {
         onExited: function(exitCode) { if(exitCode!==0 && !root.placementError) root.placementError=strings.t("placementError") }
     }
     Timer {
-        interval: root.activeFormat==="weekday-seconds" ? 100 : 1000; repeat: true; running: true
+        interval: (root.activeFormat==="weekday-seconds" || root.activeFormat==="date-seconds") ? 100 : 1000; repeat: true; running: true
         onTriggered: {
             var previous=root.today;
             var following=root.viewYear===previous.year && root.viewMonth===previous.monthIndex && root.selectedDay===previous.day;
@@ -81,7 +84,7 @@ Panel {
         id: button
         anchors.fill: parent
         bar: root.bar
-        text: root.vertical ? Model.time(root.now).slice(0,5).replace(':','\n') : Model.label(root.now, root.activeFormat)
+        text: root.vertical ? Model.time(root.now).slice(0,-3).replace(':','\n') : ((root.setting("placement","centerBegin")==="centerEnd" ? "| " : "") + Model.label(root.now, root.activeFormat,root.monthSystem) + (root.setting("placement","centerBegin")==="centerBegin" ? " |" : ""))
         labelVisible: true
         pressFeedbackButtons: Qt.NoButton
         tooltipText: Model.plain(strings.t("barHint"))
@@ -142,7 +145,7 @@ Panel {
                             width: parent.width; height: hero.implicitHeight+Style.space(12)
                             PlainText {
                                 id: hero; anchors.horizontalCenter: parent.horizontalCenter
-                                text: Model.months[root.today.monthIndex]+" "+I18n.formatNumber(root.today.day)
+                                text: Model.monthName(root.today.monthIndex,root.monthSystem)+" "+I18n.formatNumber(root.today.day)
                                 font.family: root.family; font.pixelSize: Math.min(Style.space(52),parent.width/9); font.bold: true
                                 color: root.fg
                             }
@@ -196,7 +199,7 @@ Panel {
                                     PlainText { anchors.centerIn: parent; text: I18n.formatNumber(cell.day); color: root.fg; font.family: root.family; font.bold: cell.isToday }
                                     Row {
                                         anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom; anchors.bottomMargin: Style.space(7); spacing: Style.space(4)
-                                        Rectangle { visible: cell.theme!==""; width: Style.space(12); height: Style.space(2); color: ({Spirit: "#6B8E23", Soul: "#4682B4", Mind: "#663399", Body: "#CD853F"})[cell.theme] || "transparent"; opacity: 0.65 }
+                                        Rectangle { visible: cell.theme!==""; width: Style.space(12); height: Style.space(2); color: Model.themeColor(cell.theme); opacity: 0.65 }
                                         Rectangle { visible: cell.holy.length>0; width: Style.space(4); height: width; radius: width/2; color: root.fg; opacity: 0.7 }
                                     }
                                     MouseArea { id: cellMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.selectedDay=cell.day }
@@ -206,7 +209,7 @@ Panel {
                         }
                         Item {
                             width: parent.width; height: Style.space(34)
-                            PlainText { anchors.centerIn: parent; text: Model.months[root.viewMonth].toUpperCase()+" "+I18n.formatNumber(root.viewYear); color: Qt.darker(root.fg,1.4); font.letterSpacing: 1; font.pixelSize: Style.font.bodySmall }
+                            PlainText { anchors.centerIn: parent; text: Model.monthName(root.viewMonth,root.monthSystem).toUpperCase()+" "+I18n.formatNumber(root.viewYear); color: Qt.darker(root.fg,1.4); font.letterSpacing: 1; font.pixelSize: Style.font.bodySmall }
                             PanelActionButton { anchors.left: parent.left; iconText: I18n.rightToLeft?"󰅂":"󰅁"; foreground: root.fg; tooltipText: Model.plain(strings.t("previous")); focusable: true; onClicked: root.moveMonth(-1) }
                             PanelActionButton { anchors.right: parent.right; iconText: I18n.rightToLeft?"󰅁":"󰅂"; foreground: root.fg; tooltipText: Model.plain(strings.t("next")); focusable: true; onClicked: root.moveMonth(1) }
                         }
@@ -220,7 +223,7 @@ Panel {
                             visible: root.quote!==null
                             width: parent.width; spacing: Style.space(10)
                             Rectangle { width: parent.width; height: Style.spacing.hairline; color: Qt.alpha(root.fg,0.12) }
-                            PlainText { width: parent.width; text: strings.t(root.selectedTheme).toUpperCase(); font.pixelSize: Style.font.caption; font.letterSpacing: 2; color: Commons.Color.accent; horizontalAlignment: Text.AlignHCenter }
+                            PlainText { width: parent.width; text: strings.t(root.selectedTheme).toUpperCase(); font.pixelSize: Style.font.caption; font.letterSpacing: 2; color: Model.themeColor(root.selectedTheme); horizontalAlignment: Text.AlignHCenter }
                             PlainText { width: parent.width-Style.space(40); anchors.horizontalCenter: parent.horizontalCenter; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; text: root.quote ? '“'+root.quote.text+'”' : ''; font.pixelSize: Style.font.body; lineHeight: 1.3 }
                             PlainText { width: parent.width; text: root.quote ? root.quote.author : ''; color: Qt.darker(root.fg,1.5); font.pixelSize: Style.font.bodySmall; horizontalAlignment: Text.AlignHCenter }
                         }
@@ -228,13 +231,13 @@ Panel {
                     Column {
                         visible: root.editing
                         width: parent.width; spacing: Style.space(8)
-                        PlainText { text: strings.t("display"); font.bold: true }
+                        PlainText { text: strings.t("monthNames"); font.bold: true }
                         Repeater {
-                            model: Model.formats
+                            model: ["disciple","numerical","seasonal"]
                             SettingRow {
                                 required property string modelData
-                                width: parent.width; label: strings.t("format."+modelData); checked: root.activeFormat===modelData
-                                onToggled: root.save("format",modelData)
+                                width: parent.width; label: strings.t("months."+modelData); checked: root.monthSystem===modelData
+                                onToggled: root.save("monthNames",modelData)
                             }
                         }
                         PlainText { text: strings.t("calendar"); font.bold: true }

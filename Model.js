@@ -17,21 +17,29 @@ function gregorian(year, month, day) {
 function time(date) {
     var seconds = Math.floor((date.getHours()*3600000 + date.getMinutes()*60000 + date.getSeconds()*1000 + date.getMilliseconds()) / 864);
     function pad(n) { return ('0' + n).slice(-2); }
-    return pad(Math.floor(seconds/10000)) + ':' + pad(Math.floor(seconds/100)%100) + ':' + pad(seconds%100);
+    return Math.floor(seconds/10000) + ':' + pad(Math.floor(seconds/100)%100) + ':' + pad(seconds%100);
 }
 var weekdays = ['Primeday','Biday','Triday','Quartaday','Pentaday','Hexaday','Septeday','Octoday','Noveday','Deceday'];
 var headings = ['Prime','Bi','Tri','Quarta','Penta','Hexa','Septe','Octo','Nove','Dece'];
-var formats = ['date-time','weekday-time','weekday-seconds','time','date-week-year','numeric','date-percent','percent'];
+var formats = ['date-time','date-seconds','weekday-time','weekday-seconds','time','date-week-year','numeric','date-percent','percent'];
 function formatIndex(value) { var i = formats.indexOf(value); return i < 0 ? 0 : i; }
 function nextFormat(value) { return formats[(formatIndex(value)+1)%formats.length]; }
 function dayFraction(date) { return (date.getHours()*3600000+date.getMinutes()*60000+date.getSeconds()*1000+date.getMilliseconds())/86400000; }
 function percent(date) { return Math.min(99.9,Math.round(dayFraction(date)*1000)/10).toFixed(1)+'%'; }
-function label(date, format) {
-    var p=parts(date), t=time(date), shortTime=t.slice(0,5), name=months[p.monthIndex];
+var monthSystems = {
+ disciple: months,
+ numerical: ['Primember','Biember','Triember','Quartember','Pentember','Hexember','September','Octember','November','December'],
+ seasonal: ['Winterma','Frostma','Springma','Bloomma','Greemma','Summama','Heatma','Harvestma','Autumnma','Coldma']
+};
+function monthName(index,system) { return (monthSystems[system] || months)[index]; }
+function themeColor(theme) { return ({Spirit:'#6B8E23',Soul:'#4682B4',Mind:'#663399',Body:'#CD853F'})[theme] || 'transparent'; }
+function label(date, format, system) {
+    var p=parts(date), t=time(date), shortTime=t.slice(0,-3), name=monthName(p.monthIndex,system);
     var w=p.monthIndex===9 ? ['Feast','Soul','Mind','Body','Christmas','Leap Day'][p.day-1] : weekdays[(p.day-1)%10];
     var shortDay=p.monthIndex===9 ? w : headings[(p.day-1)%10];
-    var d=shortDay+' '+p.day+' '+name;
+    var d=name+' '+p.day;
     switch(format) {
+    case 'date-seconds':return d+' '+t;
     case 'weekday-time':return w+' '+shortTime;
     case 'weekday-seconds':return w+' '+t;
     case 'time':return shortTime;
