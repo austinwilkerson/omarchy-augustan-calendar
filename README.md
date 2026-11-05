@@ -24,7 +24,7 @@ Requires Omarchy's Quickshell-based shell with `omarchy plugin` support. Runtime
 
 ```bash
 omarchy plugin add https://github.com/austinwilkerson/omarchy-augustan-calendar --enable --yes
-omarchy bar move io.github.austinwilkerson.augustan --before omarchy.clock
+omarchy bar move io.github.austinwilkerson.augustan --after omarchy.clock
 ```
 
 Or clone this repository and run `bash install.sh`. Its optional argument selects `centerBegin` (default, left of the regular clock), `centerEnd` (right of it), `left`, `right`, `center`, or `tray`. The plugin follows a vertical bar too. The regular clock remains part of a centered pair, and its format is preserved.

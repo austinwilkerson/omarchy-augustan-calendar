@@ -16,13 +16,14 @@
     "displayName": "Augustan Calendar",
     "category": "Time",
     "allowMultiple": false,
-    "defaultSection": "centerBegin",
+    "defaultSection": "center",
     "defaults": {
       "format": "date-time",
       "specialDays": true,
       "holyDays": true,
       "quotes": true,
-      "monthNames": "disciple"
+      "monthNames": "disciple",
+      "placement": "centerEnd"
     },
     "schema": [
       {
