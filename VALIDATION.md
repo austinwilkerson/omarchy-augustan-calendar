@@ -20,3 +20,17 @@ changes its placement through Omarchy commands. It requires no root access and
 does not modify packaged Omarchy files. Standard Git installation does not invoke
 this script. Marketplace review of that installer capability remains a separate
 maintainer decision.
+
+## Runtime state audit
+
+| Workflow | Owner | States and transition rules |
+| --- | --- | --- |
+| Popup and settings | [Augustan.qml](Augustan.qml), Omarchy's Panel controller | Open starts in the calendar on Today. Gear opens settings. Escape returns to the calendar, then closes it. |
+| Today and browsing | [Augustan.qml](Augustan.qml), [Model.js](Model.js) | Open, Home and Today follow the live date. Selecting a day or stepping a month captures a browsing date. Midnight updates Today and keeps the browsing date. Month navigation clamps the day to the destination month. |
+| Clock and display settings | [Augustan.qml](Augustan.qml), [Model.js](Model.js) | Right-click advances the persisted display format. Second-precision formats select the faster timer. Month names, markings and quotes affect presentation without changing the selected date. |
+| Bar placement | [Augustan.qml](Augustan.qml), Omarchy's bar command | Idle → moving → idle or failed. The requested preference is staged before moving because Omarchy can recreate the widget. A rejected move restores the previous preference and reports the error. |
+
+The existing calendar status command includes `viewMode` and `placementState`
+alongside the selected date and error details. The isolated QML fixture tests
+date rollover in both view modes and uses a fake bar command to test placement
+rejection and retry.

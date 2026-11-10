@@ -13,11 +13,17 @@ Panel {
     ipcTarget: moduleName
     property date now: new Date()
     readonly property var today: Model.parts(now)
-    property int viewYear: today.year
-    property int viewMonth: today.monthIndex
-    property int selectedDay: today.day
+    property var browsedDate: null
+    readonly property string viewMode: browsedDate === null ? "today" : "browsing"
+    readonly property var viewDate: browsedDate || today
+    readonly property int viewYear: viewDate.year
+    readonly property int viewMonth: viewDate.monthIndex
+    readonly property int selectedDay: viewDate.day
     property bool editing: false
     property string placementError: ""
+    property string requestedPlacement: ""
+    property var previousPlacement
+    readonly property string placementState: requestedPlacement ? "moving" : placementError ? "failed" : "idle"
     readonly property bool vertical: bar ? bar.vertical : false
     readonly property string monthSystem: String(setting("monthNames", "disciple"))
     readonly property string activeFormat: String(setting("format", "date-time"))
@@ -39,48 +45,60 @@ Panel {
     function save(key,value) {
         var entry={id:root.moduleName};
         for(var k in root.settings) if(k!=="id") entry[k]=root.settings[k];
-        entry[key]=value;
+        if(value===undefined) delete entry[key];
+        else entry[key]=value;
         root.settings=entry;
         if(root.bar && root.bar.shell) root.bar.shell.updateEntryInline(root.moduleName,entry);
     }
-    function goToToday() { viewYear=today.year; viewMonth=today.monthIndex; selectedDay=today.day; }
+    function goToToday() { browsedDate=null; }
+    function selectDay(day) {
+        if(day>=1 && day<=countDays) browsedDate={year:viewYear,monthIndex:viewMonth,day:day};
+    }
     function moveMonth(delta) {
         var next=Model.stepMonth(viewYear,viewMonth,delta);
-        viewYear=next.year; viewMonth=next.month;
-        selectedDay=Math.min(selectedDay,Model.daysInMonth(viewYear,viewMonth));
+        browsedDate={year:next.year,monthIndex:next.month,
+            day:Math.min(selectedDay,Model.daysInMonth(next.year,next.month))};
     }
     function open() { goToToday(); editing=false; root.controller.show(); }
     function place(section) {
+        if(requestedPlacement) return;
+        previousPlacement=root.settings.placement;
+        requestedPlacement=section;
         root.placementError="";
+        // The shell may recreate this panel when the move succeeds.
+        root.save("placement",section);
         placement.command=(section==="centerBegin" || section==="centerEnd")
             ? ["omarchy","bar","move",root.moduleName,section==="centerBegin"?"--before":"--after","omarchy.clock"]
             : ["omarchy","bar","move",root.moduleName,"--section",section,"--index","0"];
         placement.running=true;
     }
+    function finishPlacement(exitCode, detail) {
+        if(exitCode!==0) {
+            if(root.settings.placement===requestedPlacement) root.save("placement",previousPlacement);
+            placementError=detail || strings.t("placementError");
+        }
+        requestedPlacement="";
+        previousPlacement=undefined;
+    }
     Process {
         id: placement
-        stderr: StdioCollector { onStreamFinished: root.placementError=text.trim() }
-        onExited: function(exitCode) { if(exitCode!==0 && !root.placementError) root.placementError=strings.t("placementError") }
+        stderr: StdioCollector { id: placementDiagnostics }
+        onExited: function(exitCode) { root.finishPlacement(exitCode, placementDiagnostics.text.trim()) }
     }
     Timer {
         interval: (root.activeFormat==="weekday-seconds" || root.activeFormat==="date-seconds") ? 100 : 1000; repeat: true; running: true
-        onTriggered: {
-            var previous=root.today;
-            var following=root.viewYear===previous.year && root.viewMonth===previous.monthIndex && root.selectedDay===previous.day;
-            root.now=new Date();
-            if(following && (previous.day!==root.today.day || previous.monthIndex!==root.today.monthIndex || previous.year!==root.today.year)) root.goToToday();
-        }
+        onTriggered: root.now=new Date()
     }
     // Small IPC surface for keyboard shortcuts and integration checks.
     ShellIpc {
         target: root.moduleName + ".calendar"
-        function status(): string { return JSON.stringify({opened:root.opened,editing:root.editing,year:root.viewYear,month:root.viewMonth,day:root.selectedDay,theme:root.selectedTheme,quote:root.quote,format:root.activeFormat,specialDays:root.showSpecial,holyDays:root.showHoly,quotes:root.showQuotes,placementError:root.placementError}) }
+        function status(): string { return JSON.stringify({opened:root.opened,editing:root.editing,year:root.viewYear,month:root.viewMonth,day:root.selectedDay,viewMode:root.viewMode,theme:root.selectedTheme,quote:root.quote,format:root.activeFormat,specialDays:root.showSpecial,holyDays:root.showHoly,quotes:root.showQuotes,placementState:root.placementState,placementError:root.placementError}) }
         function cycleFormat(): void { root.save("format",Model.nextFormat(root.activeFormat)) }
         function settings(): void { root.open(); root.editing=true }
         function nextMonth(): void { root.moveMonth(1) }
         function previousMonth(): void { root.moveMonth(-1) }
         function today(): void { root.goToToday() }
-        function selectDay(day: int): void { if(day>=1 && day<=root.countDays) root.selectedDay=day }
+        function selectDay(day: int): void { root.selectDay(day) }
     }
     WidgetButton {
         id: button
@@ -200,15 +218,15 @@ Panel {
                                     border.width: isToday ? Style.spacing.hairline : 0
                                     border.color: Style.normalBorderFor(root.fg,Commons.Color.accent)
                                     activeFocusOnTab: true
-                                    Keys.onReturnPressed: root.selectedDay=day
-                                    Keys.onSpacePressed: root.selectedDay=day
+                                    Keys.onReturnPressed: root.selectDay(day)
+                                    Keys.onSpacePressed: root.selectDay(day)
                                     PlainText { anchors.centerIn: parent; text: I18n.formatNumber(cell.day); color: root.fg; font.family: root.family; font.bold: cell.isToday }
                                     Row {
                                         anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom; anchors.bottomMargin: Style.space(7); spacing: Style.space(4)
                                         Rectangle { visible: cell.theme!==""; width: Style.space(12); height: Style.space(2); color: Model.themeColor(cell.theme); opacity: 0.65 }
                                         Rectangle { visible: cell.holy.length>0; width: Style.space(4); height: width; radius: width/2; color: root.fg; opacity: 0.7 }
                                     }
-                                    MouseArea { id: cellMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.selectedDay=cell.day }
+                                    MouseArea { id: cellMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.selectDay(cell.day) }
                                     PanelToolTip { visible: cellMouse.containsMouse && (cell.theme!=="" || cell.holy.length>0); text: Model.plain(([cell.theme].filter(function(v){return v!==""})).concat(cell.holy).join(" · ")); fontFamily: root.family }
                                 }
                             }
@@ -256,8 +274,8 @@ Panel {
                             SettingRow {
                                 required property string modelData
                                 width: parent.width; label: strings.t("place."+modelData); checked: root.setting("placement", "centerBegin")===modelData
-                                enabled: !placement.running
-                                onToggled: { root.save("placement",modelData); root.place(modelData) }
+                                enabled: root.placementState!=="moving"
+                                onToggled: root.place(modelData)
                             }
                         }
                         PlainText { width: parent.width; wrapMode: Text.WordWrap; visible: root.placementError!==""; text: root.placementError; font.pixelSize: Style.font.bodySmall }

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.austinwilkerson.augustan",
   "name": "Omarchy Augustan Calendar",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "Austin Wilkerson",
   "license": "MIT",
   "description": "A native Augustan calendar, decimal clock, day themes and reflections for Omarchy.",
