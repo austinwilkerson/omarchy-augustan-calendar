@@ -34,3 +34,7 @@ The existing calendar status command includes `viewMode` and `placementState`
 alongside the selected date and error details. The isolated QML fixture tests
 date rollover in both view modes and uses a fake bar command to test placement
 rejection and retry.
+
+For 1.1.2 on Omarchy Stable 4.5, the panel code called the real bar command
+to move the Calendar to the right section and back beside the clock. The
+original bar position and widget settings were verified afterward.
